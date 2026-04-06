@@ -1,0 +1,274 @@
+.contact {
+  padding: 80px 48px;
+  background: var(--bg);
+  border-top: 1.5px solid var(--border-color);
+  min-height: 100vh;
+  transition: background 0.4s ease;
+}
+
+.contact__inner {
+  display: flex;
+  gap: 60px;
+  align-items: flex-start;
+}
+
+.contact__left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.contact__heading-line {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+}
+
+.contact__info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact__block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact__block-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.contact__email {
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--blue);
+  transition: opacity 0.3s ease;
+}
+
+.contact__email:hover {
+  opacity: 0.7;
+}
+
+.contact__form-btn {
+  align-self: flex-start;
+}
+
+/* ═══ Right Side ═══ */
+.contact__right {
+  flex: 1;
+  position: relative;
+  min-height: 600px;
+}
+
+.contact__image {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Floating note */
+.contact__note {
+  position: absolute;
+  bottom: 130px;
+  left: -40px;
+  transform-origin: bottom left;
+  background: var(--note-bg);
+  color: var(--fg);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  width: 220px;
+  z-index: 4;
+}
+
+.contact__note-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.contact__note-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.contact__note-close {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.contact__note-close:hover {
+  transform: scale(1.3);
+}
+
+.contact__note-date {
+  font-size: 0.65rem;
+  color: var(--note-date);
+  margin-bottom: 12px;
+}
+
+.contact__note-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+/* Folder */
+.contact__folder {
+  position: absolute;
+  bottom: 60px;
+  left: -40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 3;
+  transition: transform 0.2s ease;
+}
+
+.contact__folder:hover {
+  transform: scale(1.1);
+}
+
+.contact__folder-icon {
+  font-size: 3rem;
+}
+
+.contact__folder-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+/* Mini preview */
+.contact__mini-preview {
+  position: absolute;
+  bottom: 20px;
+  right: -10px;
+  width: 100px;
+  height: 70px;
+  background: var(--note-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 3;
+}
+
+.contact__mini-bar {
+  height: 8px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.contact__mini-content {
+  height: 100%;
+  background: var(--card-bg);
+}
+
+@media (max-width: 1024px) {
+  .contact__inner {
+    flex-direction: column;
+  }
+
+  .contact {
+    padding: 60px 24px;
+  }
+
+  .contact__right {
+    min-height: 400px;
+  }
+
+  .contact__image {
+    height: 400px;
+  }
+
+  .contact__note {
+    bottom: 130px;
+    left: -20px;
+    width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact {
+    padding: 48px 20px;
+    min-height: auto;
+  }
+
+  .contact__inner {
+    gap: 32px;
+  }
+
+  .contact__heading-line {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+  }
+
+  .contact__right {
+    min-height: 300px;
+  }
+
+  .contact__image {
+    height: 300px;
+  }
+
+  .contact__note {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .contact__folder {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    flex-direction: row;
+    margin-top: 12px;
+  }
+
+  .contact__folder-icon {
+    font-size: 2rem;
+  }
+
+  .contact__mini-preview {
+    display: none;
+  }
+
+  .contact__email {
+    font-size: clamp(1rem, 4vw, 1.5rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .contact {
+    padding: 36px 16px;
+  }
+
+  .contact__heading-line {
+    font-size: clamp(1.6rem, 7vw, 2.5rem);
+  }
+
+  .contact__right {
+    min-height: 240px;
+  }
+
+  .contact__image {
+    height: 240px;
+  }
+}

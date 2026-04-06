@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════
+   ClosetX — Global Styles
+   Neo-Brutalist / Y2K / Chrome Aesthetic
+   ═══════════════════════════════════════════════════════════ */
+
+/* @font-face declarations — Helvetica Bold, Regular + Nautica */
+@font-face {
+  font-family: 'Helvetica';
+  src: url('/fonts/Helvetica-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Helvetica';
+  src: url('/fonts/Helvetica-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nautica';
+  src: url('/fonts/nautica-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ═══ Light Mode (default) ═══ */
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+  --fg-muted: rgba(0, 0, 0, 0.6);
+  --fg-faint: rgba(0, 0, 0, 0.08);
+  --fg-micro: rgba(0, 0, 0, 0.04);
+  --blue: #2400FF;
+  --surface: #f5f5f5;
+  --card-bg: #ffffff;
+  --card-hover-bg: #000000;
+  --card-hover-fg: #ffffff;
+  --border-color: #000000;
+  --nav-bg: rgba(255, 255, 255, 0.85);
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --note-bg: #ffffff;
+  --note-date: rgba(0, 0, 0, 0.4);
+
+  --font-main: 'Helvetica', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Helvetica', 'Helvetica Neue', Arial, sans-serif;
+  --font-accent: 'Nautica', 'Helvetica', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ═══ Dark Mode ═══ */
+[data-theme="dark"] {
+  --bg: #0a0a0a;
+  --fg: #f0f0f0;
+  --fg-muted: rgba(255, 255, 255, 0.5);
+  --fg-faint: rgba(255, 255, 255, 0.1);
+  --fg-micro: rgba(255, 255, 255, 0.04);
+  --blue: #4d3aff;
+  --surface: #161616;
+  --card-bg: #111111;
+  --card-hover-bg: #4d3aff;
+  --card-hover-fg: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --nav-bg: rgba(10, 10, 10, 0.88);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --note-bg: #1a1a1a;
+  --note-date: rgba(255, 255, 255, 0.35);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: auto;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--fg);
+  overflow-x: hidden;
+  cursor: none !important;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+* {
+  cursor: none !important;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  cursor: none !important;
+}
+
+button {
+  cursor: none !important;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::selection {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+/* Pill Button Style — Neo Brutalist */
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.3s var(--ease-out-expo);
+  background: transparent;
+  color: var(--fg);
+}
+
+.pill-btn:hover {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.pill-btn--white {
+  border-color: #fff;
+  color: #fff;
+}
+
+.pill-btn--white:hover {
+  background: #fff;
+  color: #000;
+}
+
+.pill-btn--blue {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.pill-btn--blue:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* Section label style */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::before {
+  content: '(';
+}
+
+.section-label::after {
+  content: ')';
+}
+
+/* Giant heading style — ultra bold, tight tracking */
+.giant-heading {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+/* Bracket text */
+.bracket-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bracket-text::before {
+  content: '[  ';
+}
+
+.bracket-text::after {
+  content: '  ]';
+}
+
+/* Utility */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.line-reveal {
+  overflow: hidden;
+}
+
+.line-reveal > * {
+  transform: translateY(100%);
+}
+
+.tilt-hover {
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.tilt-hover:hover {
+  transform: scale(1.02) rotate(-1deg);
+}
+
+@media (max-width: 768px) {
+  .giant-heading {
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  body, *, a, button {
+    cursor: auto !important;
+  }
+
+  .custom-cursor,
+  .custom-cursor-follower {
+    display: none !important;
+  }
+
+  .pill-btn {
+    padding: 7px 16px;
+    font-size: 0.7rem;
+  }
+
+  .section-label {
+    font-size: 0.65rem;
+  }
+
+  .bracket-text {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .giant-heading {
+    font-size: clamp(1.8rem, 9vw, 2.8rem);
+  }
+
+  .pill-btn {
+    padding: 6px 14px;
+    font-size: 0.65rem;
+  }
+}

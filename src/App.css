@@ -1,0 +1,70 @@
+/* ═══════════════════════════════════════════════════════════
+   App — Preloader + Layout
+   ═══════════════════════════════════════════════════════════ */
+
+.app {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ═══ Preloader ═══ */
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.loader__logo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.loader__text {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #fff;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.loader__text--blue {
+  color: var(--blue);
+}
+
+.loader__progress {
+  width: 200px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loader__bar {
+  width: 100%;
+  height: 100%;
+  background: var(--white);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.loader__counter {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.4);
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,133 @@
+.hiw {
+  padding: 100px 48px;
+  background: var(--bg);
+  border-top: 1.5px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.4s ease;
+}
+
+.hiw__header {
+  margin-bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hiw__steps {
+  display: flex;
+  flex-direction: column;
+}
+
+.hiw__step {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 40px 0;
+  border-bottom: 1.5px solid var(--border-color);
+  position: relative;
+  transition: all 0.4s var(--ease-out-expo);
+}
+
+.hiw__step:first-child {
+  border-top: 1.5px solid var(--border-color);
+}
+
+.hiw__step:hover {
+  padding-left: 20px;
+  background: var(--surface);
+}
+
+.hiw__step-num {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--fg-faint);
+  min-width: 100px;
+  letter-spacing: -0.02em;
+  transition: color 0.4s var(--ease-out-expo);
+}
+
+.hiw__step:hover .hiw__step-num {
+  color: var(--blue);
+}
+
+.hiw__step-content {
+  flex: 1;
+}
+
+.hiw__step-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.hiw__step-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg-muted);
+  max-width: 500px;
+}
+
+.hiw__step-visual {
+  font-size: 3rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hiw {
+    padding: 60px 20px;
+  }
+
+  .hiw__header {
+    margin-bottom: 40px;
+  }
+
+  .hiw__step {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 24px 0;
+  }
+
+  .hiw__step:hover {
+    padding-left: 0;
+  }
+
+  .hiw__step-num {
+    font-size: 2rem;
+    min-width: auto;
+  }
+
+  .hiw__step-title {
+    font-size: 1.2rem;
+  }
+
+  .hiw__step-desc {
+    font-size: 0.85rem;
+  }
+
+  .hiw__step-visual {
+    font-size: 2rem;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .hiw {
+    padding: 48px 16px;
+  }
+
+  .hiw__step-num {
+    font-size: 1.6rem;
+  }
+
+  .hiw__step-title {
+    font-size: 1.05rem;
+  }
+
+  .hiw__step-visual {
+    font-size: 1.6rem;
+  }
+}
