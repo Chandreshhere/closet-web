@@ -4,17 +4,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 
 import CustomCursor from './components/CustomCursor'
-import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
 import About from './components/About'
 import Features from './components/Features'
 import HowItWorks from './components/HowItWorks'
 import Showcase from './components/Showcase'
+import ScrollGrid from './components/ScrollGrid'
 import Brands from './components/Brands'
 import Gallery from './components/Gallery'
-import Contact from './components/Contact'
-import JoinCTA from './components/JoinCTA'
 import Footer from './components/Footer'
 
 import './App.css'
@@ -43,13 +41,19 @@ function App() {
 
   useEffect(() => {
     // ═══ Lenis Smooth Scroll ═══
+    // Buttery scroll: lerp-based Lenis (more responsive, less easing lag)
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
+      lerp: 0.085,
       smoothWheel: true,
+      smoothTouch: false,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      syncTouch: false,
     })
 
+    // Bridge Lenis ↔ ScrollTrigger so all scroll-bound animations stay in sync
     lenis.on('scroll', ScrollTrigger.update)
 
     gsap.ticker.add((time) => {
@@ -58,7 +62,27 @@ function App() {
 
     gsap.ticker.lagSmoothing(0)
 
+    // Tell ScrollTrigger to use Lenis for proxying scroll position
+    ScrollTrigger.scrollerProxy(document.documentElement, {
+      scrollTop(value) {
+        if (arguments.length) lenis.scrollTo(value, { immediate: true })
+        return window.scrollY
+      },
+      getBoundingClientRect() {
+        return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight }
+      },
+    })
+
+    ScrollTrigger.defaults({ ignoreMobileResize: true })
+    ScrollTrigger.refresh()
+
     // ═══ Preloader Animation ═══
+    const suffixEl = document.querySelector('.loader__x-suffix')
+    const setSuffix = (txt) => {
+      if (!suffixEl) return
+      suffixEl.textContent = txt
+    }
+    setSuffix('')
     const tl = gsap.timeline()
 
     tl.to('.loader__text', {
@@ -68,30 +92,46 @@ function App() {
       ease: 'power3.out',
       stagger: 0.08,
     })
-      .to('.loader__counter', {
-        innerText: 100,
-        duration: 1.5,
-        ease: 'power2.inOut',
-        snap: { innerText: 1 },
-        onUpdate: function () {
-          const el = document.querySelector('.loader__counter')
-          if (el) el.textContent = Math.round(this.targets()[0].innerText)
+    // Step through each suffix — show one at a time
+    const WORDS = ['PRESS', 'CLUSIVE', 'TRA', 'PERIENCE']
+    const HOLD = 0.55
+
+    WORDS.forEach((w, i) => {
+      tl.call(
+        () => {
+          setSuffix('')
+          gsap.fromTo(
+            suffixEl,
+            { y: 12, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.28,
+              ease: 'power3.out',
+              onStart: () => setSuffix(w),
+            }
+          )
         },
-      })
-      .to(
-        '.loader__bar',
-        {
-          scaleX: 1,
-          duration: 1.5,
-          ease: 'power2.inOut',
-        },
-        '<'
+        null,
+        i === 0 ? '+=0.3' : `+=${HOLD}`
       )
+    })
+
+    const totalLoaderDur = WORDS.length * HOLD + 0.3
+    tl.to(
+      '.loader__bar',
+      {
+        scaleX: 1,
+        duration: totalLoaderDur,
+        ease: 'none',
+      },
+      `-=${totalLoaderDur}`
+    )
       .to('.loader', {
         y: '-100%',
-        duration: 0.8,
-        ease: 'power3.inOut',
-        delay: 0.3,
+        duration: 0.9,
+        ease: 'power4.inOut',
+        delay: 0.25,
       })
       .set('.loader', { display: 'none' })
 
@@ -108,20 +148,19 @@ function App() {
         <div className="loader__content">
           <div className="loader__logo">
             <div className="loader__text">CLOSET</div>
-            <div className="loader__text loader__text--blue">X</div>
+            <div className="loader__x-group">
+              <span className="loader__text loader__text--blue">X</span>
+              <span className="loader__x-suffix" />
+            </div>
           </div>
           <div className="loader__progress">
             <div className="loader__bar" />
           </div>
-          <div className="loader__counter">0</div>
         </div>
       </div>
 
       {/* ═══ Custom Cursor ═══ */}
       <CustomCursor />
-
-      {/* ═══ Navigation ═══ */}
-      <Navbar theme={theme} toggleTheme={toggleTheme} />
 
       {/* ═══ Hero ═══ */}
       <Hero />
@@ -172,6 +211,9 @@ function App() {
       {/* ═══ Showcase / Collections ═══ */}
       <Showcase />
 
+      {/* ═══ Scroll-Expand Grid (codegrid-inspired) ═══ */}
+      <ScrollGrid />
+
       {/* ═══ Marquee 3 — Large ═══ */}
       <Marquee
         texts={[
@@ -189,12 +231,6 @@ function App() {
 
       {/* ═══ Gallery ═══ */}
       <Gallery />
-
-      {/* ═══ Contact ═══ */}
-      <Contact />
-
-      {/* ═══ Join CTA ═══ */}
-      <JoinCTA />
 
       {/* ═══ Footer ═══ */}
       <Footer />

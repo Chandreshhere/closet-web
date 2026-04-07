@@ -1,120 +1,155 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { CameraIcon, SearchIcon, SwipeIcon, SparkleIcon, BoltIcon, FlameIcon } from './Icons'
 import './Features.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
 const features = [
   {
-    title: 'Virtual Try-On',
-    desc: 'AR camera shows you how clothes look on your body before you buy. No more guessing.',
-    Icon: CameraIcon,
+    img: '/1.jpg',
     tag: 'AR POWERED',
+    title: 'Virtual Try-On',
+    desc: 'AR camera shows how clothes look on you before you buy. No more guessing.',
+    num: '01',
+    location: 'India',
+    role: 'Live Camera, AR Engine',
   },
   {
-    title: 'Image Search',
-    desc: 'Snap a photo of any outfit you see anywhere — find matching clothes instantly.',
-    Icon: SearchIcon,
+    img: '/2.jpg',
     tag: 'AI MATCHING',
+    title: 'Image Search',
+    desc: 'Snap a photo of any outfit you see — find matching clothes instantly.',
+    num: '02',
+    location: 'Worldwide',
+    role: 'Vision AI, Catalog',
   },
   {
-    title: 'Swipe Discovery',
-    desc: 'Swipe right to save, left to skip. Find your style fast, like dating but for fashion.',
-    Icon: SwipeIcon,
+    img: '/3.jpg',
     tag: 'TINDER FOR STYLE',
+    title: 'Swipe Discovery',
+    desc: 'Swipe right to save, left to skip. Find your style fast — like dating but for fashion.',
+    num: '03',
+    location: 'Mumbai',
+    role: 'Personalization',
   },
   {
-    title: 'Complete the Look',
-    desc: 'Buy a shirt, get matching pants, shoes & watch suggested. Head-to-toe in one tap.',
-    Icon: SparkleIcon,
-    tag: 'SMART STYLING',
-  },
-  {
-    title: '30-Min Delivery',
-    desc: 'From tap to doorstep in under 60 minutes. Express delivery on every single order.',
-    Icon: BoltIcon,
+    img: '/4.jpg',
     tag: 'LIGHTNING FAST',
-  },
-  {
-    title: 'Flash Drops',
-    desc: 'Limited time, steep discounts. Exclusive pieces available for a short window only.',
-    Icon: FlameIcon,
-    tag: 'LIMITED EDITION',
+    title: '30-Min Delivery',
+    desc: 'From tap to doorstep in under 60 minutes. Express delivery on every order.',
+    num: '04',
+    location: 'Metro Cities',
+    role: 'Logistics, Hyperlocal',
   },
 ]
 
 export default function Features() {
-  const sectionRef = useRef(null)
+  const wrapperRef = useRef(null)
   const headerRef = useRef(null)
   const cardsRef = useRef(null)
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        headerRef.current.children,
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          ease: 'power3.out',
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: headerRef.current,
-            start: 'top 75%',
-          },
-        }
-      )
+    const wrapper = wrapperRef.current
+    const headerSection = headerRef.current
+    const cards = cardsRef.current
+    if (!wrapper || !headerSection || !cards) return
 
-      const cards = cardsRef.current.querySelectorAll('.feature-card')
-      gsap.fromTo(
-        cards,
-        { y: 80, opacity: 0, scale: 0.95 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.7,
-          ease: 'power3.out',
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 75%',
-          },
-        }
-      )
-    }, sectionRef)
+    const triggers = []
 
-    return () => ctx.revert()
+    // Pin the editorial heading background — stays fixed while cards scroll over
+    const headerPin = ScrollTrigger.create({
+      trigger: wrapper,
+      start: 'top top',
+      end: 'bottom bottom',
+      pin: headerSection,
+      pinSpacing: false,
+      anticipatePin: 1,
+    })
+    triggers.push(headerPin)
+
+    return () => {
+      triggers.forEach((t) => t.kill())
+    }
   }, [])
 
   return (
-    <section ref={sectionRef} className="features" id="features">
-      <div ref={headerRef} className="features__header">
-        <div className="section-label">Features</div>
-        <h2 className="features__title giant-heading">
-          Shop
+    <section ref={wrapperRef} className="features" id="features">
+      {/* ─── Pinned editorial background ─── */}
+      <div ref={headerRef} className="features__bg">
+        {/* Top headline */}
+        <h2 className="features__top">
+          Shop made
           <br />
-          Smart.
+          visible
         </h2>
-        <p className="features__subtitle">
-          Every feature designed to make fashion instant, personal & effortless.
-        </p>
+
+        {/* Side captions like the reference */}
+        <div className="features__captions">
+          <div className="features__caption">
+            <p className="features__caption-bold">Smart fashion. Instant intent.</p>
+          </div>
+          <div className="features__caption">
+            <p>An open view into</p>
+            <p>a smarter way to shop.</p>
+            <p className="features__caption-mute">
+              Speed, style, and personalisation —
+              <br />
+              expressed through one app.
+            </p>
+          </div>
+        </div>
+
+        {/* Left bottom small captions */}
+        <div className="features__bottom-notes">
+          <p>
+            <strong>Tap</strong> what you crave.
+          </p>
+          <p>
+            <strong>See</strong> it on you instantly.
+          </p>
+          <p>
+            <strong>Wear</strong> it in <strong>minutes</strong>.
+          </p>
+        </div>
+
+        {/* Bottom giant headline */}
+        <h2 className="features__bottom">
+          Fashion shaped
+          <br />
+          by you
+        </h2>
       </div>
 
-      <div ref={cardsRef} className="features__grid">
+      {/* ─── Floating cards over the pinned background ─── */}
+      <div ref={cardsRef} className="features__cards">
         {features.map((f, i) => (
-          <div key={i} className="feature-card interactive">
-            <div className="feature-card__tag">{f.tag}</div>
-            <div className="feature-card__icon">
-              <f.Icon size={36} />
+          <div key={i} className={`feature-card feature-card--${i + 1}`}>
+            <div className="feature-card__img-wrap">
+              <img src={f.img} alt={f.title} className="feature-card__img" />
+              {/* Rotating circular badge */}
+              <div className="feature-card__badge">
+                <svg viewBox="0 0 200 200">
+                  <defs>
+                    <path
+                      id={`circle-${i}`}
+                      d="M 100,100 m -75,0 a 75,75 0 1,1 150,0 a 75,75 0 1,1 -150,0"
+                    />
+                  </defs>
+                  <text>
+                    <textPath href={`#circle-${i}`}>
+                      CLOSETX • {f.tag} • CLOSETX • {f.tag} •
+                    </textPath>
+                  </text>
+                </svg>
+              </div>
             </div>
-            <h3 className="feature-card__title">{f.title}</h3>
-            <p className="feature-card__desc">{f.desc}</p>
-            <div className="feature-card__number">
-              {String(i + 1).padStart(2, '0')}
+            <div className="feature-card__info">
+              <p className="feature-card__title">{f.title}</p>
+              <div className="feature-card__meta">
+                <span>{f.location}</span>
+                <span className="feature-card__role">{f.role}</span>
+              </div>
             </div>
           </div>
         ))}

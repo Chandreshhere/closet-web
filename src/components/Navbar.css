@@ -1,3 +1,16 @@
+.navbar__get-app {
+  color: #000 !important;
+  background: #fff !important;
+  border-color: #fff !important;
+  font-weight: 700;
+}
+
+.navbar__get-app:hover {
+  color: #fff !important;
+  background: transparent !important;
+  border-color: #fff !important;
+}
+
 .navbar {
   position: fixed;
   top: 0;

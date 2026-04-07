@@ -1,155 +1,236 @@
 .features {
-  padding: 100px 48px;
-  background: var(--bg);
   position: relative;
+  height: 240vh;
+  background: #000;
+  color: #fff;
   overflow: hidden;
-  transition: background 0.4s ease;
 }
 
-.features__header {
-  margin-bottom: 64px;
+/* ─── Pinned editorial background ─── */
+.features__bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  padding: 60px 48px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  position: relative;
+  justify-content: space-between;
+  background: #000;
   z-index: 1;
 }
 
-.features__title {
-  color: var(--fg);
+.features__top,
+.features__bottom {
+  font-size: clamp(3.5rem, 11vw, 12rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  margin: 0;
+  color: #fff;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-.features__subtitle {
-  font-size: 1.1rem;
-  color: var(--fg-muted);
-  max-width: 400px;
+.features__bottom {
+  text-align: right;
+  align-self: flex-end;
+}
+
+/* Side captions */
+.features__captions {
+  position: absolute;
+  top: 38%;
+  left: 36%;
+  display: flex;
+  gap: 60px;
+  font-size: 0.92rem;
   line-height: 1.5;
+  max-width: 60%;
 }
 
-.features__grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: var(--border-color);
-  border: 1.5px solid var(--border-color);
-  position: relative;
-  z-index: 1;
+.features__caption p { margin: 0 0 4px; }
+.features__caption-bold { font-weight: 600; }
+.features__caption-mute { opacity: 0.55; margin-top: 8px !important; }
+
+/* Bottom-left notes */
+.features__bottom-notes {
+  position: absolute;
+  left: 48px;
+  bottom: 80px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  opacity: 0.85;
 }
+
+.features__bottom-notes p {
+  margin: 0 0 4px;
+}
+
+.features__bottom-notes strong {
+  font-weight: 700;
+}
+
+/* ─── Cards floating over pinned background ─── */
+.features__cards {
+  position: absolute;
+  top: 100vh;
+  left: 0;
+  width: 100%;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  padding: 0 48px;
+  /* Pull cards UP so they overlap the bottom of the pinned background slightly */
+  transform: translateY(-180px);
+  align-items: end;
+}
+
+/* Stagger each card vertically */
+.feature-card--1 { transform: translateY(40px); }
+.feature-card--2 { transform: translateY(0); }
+.feature-card--3 { transform: translateY(60px); }
+.feature-card--4 { transform: translateY(20px); }
 
 .feature-card {
-  background: var(--card-bg);
-  padding: 40px 32px;
-  position: relative;
+  background: #fff;
+  color: #000;
+  border-radius: 4px;
   overflow: hidden;
-  transition: all 0.4s var(--ease-out-expo);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
 }
 
-.feature-card:hover {
-  background: var(--card-hover-bg);
-  color: var(--card-hover-fg);
+.feature-card__img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: #111;
 }
 
-.feature-card:hover .feature-card__icon {
-  color: var(--blue);
+.feature-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.feature-card:hover .feature-card__tag {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
+/* Rotating circular text badge */
+.feature-card__badge {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  width: 90px;
+  height: 90px;
+  animation: feature-spin 14s linear infinite;
 }
 
-.feature-card:hover .feature-card__number {
-  color: rgba(255, 255, 255, 0.1);
+.feature-card__badge svg {
+  width: 100%;
+  height: 100%;
 }
 
-.feature-card__tag {
-  display: inline-block;
-  padding: 4px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 50px;
-  font-size: 0.65rem;
+.feature-card__badge text {
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  margin-bottom: 24px;
-  transition: all 0.4s var(--ease-out-expo);
+  letter-spacing: 0.18em;
+  fill: #fff;
 }
 
-.feature-card__icon {
-  margin-bottom: 20px;
-  transition: color 0.4s var(--ease-out-expo);
+@keyframes feature-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.feature-card__info {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
 }
 
 .feature-card__title {
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
-}
-
-.feature-card__desc {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  opacity: 0.7;
-}
-
-.feature-card__number {
-  position: absolute;
-  bottom: -10px;
-  right: 16px;
-  font-size: 5rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: var(--fg-micro);
-  line-height: 1;
-  transition: color 0.4s var(--ease-out-expo);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
+.feature-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.feature-card__role {
+  text-align: right;
+}
+
+/* ─── Responsive ─── */
 @media (max-width: 1024px) {
-  .features__grid {
+  .features {
+    height: 220vh;
+  }
+
+  .features__bg {
+    padding: 40px 24px;
+  }
+
+  .features__captions {
+    position: static;
+    margin: 24px 0;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 100%;
+  }
+
+  .features__bottom-notes {
+    left: 24px;
+    bottom: 40px;
+  }
+
+  .features__cards {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding: 0 24px;
+    transform: translateY(-120px);
   }
 
-  .features {
-    padding: 60px 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .features {
-    padding: 60px 20px;
-  }
-
-  .features__header {
-    margin-bottom: 40px;
-  }
-
-  .feature-card__title {
-    font-size: 1.2rem;
-  }
-
-  .feature-card__number {
-    font-size: 3.5rem;
+  .feature-card--1, .feature-card--2,
+  .feature-card--3, .feature-card--4 {
+    transform: none;
   }
 }
 
-@media (max-width: 600px) {
-  .features__grid {
-    grid-template-columns: 1fr;
+@media (max-width: 640px) {
+  .features {
+    height: 260vh;
   }
 
-  .feature-card {
-    padding: 28px 20px;
+  .features__top,
+  .features__bottom {
+    font-size: clamp(3rem, 13vw, 6rem);
   }
 
-  .feature-card__title {
-    font-size: 1.1rem;
+  .features__cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 0 16px;
+    transform: translateY(-80px);
   }
 
-  .feature-card__desc {
-    font-size: 0.8rem;
+  .feature-card__badge {
+    width: 64px;
+    height: 64px;
   }
 
-  .feature-card__number {
-    font-size: 3rem;
+  .feature-card__badge text {
+    font-size: 22px;
   }
 }

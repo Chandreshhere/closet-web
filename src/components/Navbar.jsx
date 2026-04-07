@@ -64,7 +64,7 @@ export default function Navbar({ theme, toggleTheme }) {
       </div>
 
       <div className="navbar__right">
-        <button className="pill-btn" onClick={() => scrollTo('download')}>
+        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('download')}>
           GET APP
         </button>
         <button
@@ -96,7 +96,7 @@ export default function Navbar({ theme, toggleTheme }) {
         <button className="pill-btn" onClick={() => scrollTo('contact')}>
           CONTACT
         </button>
-        <button className="pill-btn" onClick={() => scrollTo('download')}>
+        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('download')}>
           GET APP
         </button>
       </div>
