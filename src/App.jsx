@@ -22,6 +22,7 @@ gsap.registerPlugin(ScrollTrigger)
 function App() {
   const appRef = useRef(null)
   const loaderRef = useRef(null)
+  const [pageReady, setPageReady] = useState(false)
 
   // ═══ Dark Mode State ═══
   const [theme, setTheme] = useState(() => {
@@ -77,63 +78,84 @@ function App() {
     ScrollTrigger.refresh()
 
     // ═══ Preloader Animation ═══
-    const suffixEl = document.querySelector('.loader__x-suffix')
-    const setSuffix = (txt) => {
-      if (!suffixEl) return
-      suffixEl.textContent = txt
+    const wordEl = document.querySelector('.loader__cycle-word')
+    const counterEl = document.querySelector('.loader__foot-current')
+    const setWord = (txt) => {
+      if (wordEl) wordEl.textContent = txt
     }
-    setSuffix('')
+    setWord('X')
+
+    const WORDS = ['XPRESS', 'XCLUSIVE', 'XTRA', 'XPERIENCE', 'X']
+    const HOLD = 0.5
+    const totalLoaderDur = WORDS.length * HOLD + 0.4
+    // Make sure nothing is left invisible by a prior dev-mode mount
+    gsap.set(
+      '.loader__ascii, .loader__cycle, .loader__meta--top .loader__meta-cell, .loader__foot > *',
+      { opacity: 1, y: 0, clearProps: 'transform' }
+    )
+
     const tl = gsap.timeline()
 
-    tl.to('.loader__text', {
-      y: 0,
-      opacity: 1,
-      duration: 0.6,
-      ease: 'power3.out',
-      stagger: 0.08,
-    })
-    // Step through each suffix — show one at a time
-    const WORDS = ['PRESS', 'CLUSIVE', 'TRA', 'PERIENCE']
-    const HOLD = 0.55
-
+    // Cycle whole word — X → XPRESS → XCLUSIVE → XTRA → XPERIENCE → X
     WORDS.forEach((w, i) => {
       tl.call(
         () => {
-          setSuffix('')
           gsap.fromTo(
-            suffixEl,
-            { y: 12, opacity: 0 },
+            wordEl,
+            { yPercent: 60, opacity: 0 },
             {
-              y: 0,
+              yPercent: 0,
               opacity: 1,
               duration: 0.28,
               ease: 'power3.out',
-              onStart: () => setSuffix(w),
+              onStart: () => setWord(w),
             }
           )
         },
         null,
-        i === 0 ? '+=0.3' : `+=${HOLD}`
+        i === 0 ? '+=0.2' : `+=${HOLD}`
       )
     })
 
-    const totalLoaderDur = WORDS.length * HOLD + 0.3
+    // Bar fill + counter — shared duration
     tl.to(
       '.loader__bar',
+      { scaleX: 1, duration: totalLoaderDur, ease: 'none' },
+      `-=${totalLoaderDur}`
+    )
+    tl.to(
+      { val: 0 },
       {
-        scaleX: 1,
+        val: 100,
         duration: totalLoaderDur,
         ease: 'none',
+        onUpdate: function () {
+          if (counterEl) {
+            counterEl.textContent = String(Math.round(this.targets()[0].val)).padStart(3, '0')
+          }
+        },
       },
       `-=${totalLoaderDur}`
     )
-      .to('.loader', {
-        y: '-100%',
-        duration: 0.9,
-        ease: 'power4.inOut',
-        delay: 0.25,
-      })
-      .set('.loader', { display: 'none' })
+
+    // Hand off to a CSS-only slide so the exit runs on the compositor with
+    // zero JS-frame work — eliminates jitter from GSAP/lenis/scrolltrigger
+    // updating during the same frames as the slide.
+    tl.call(() => {
+      const loaderEl = document.querySelector('.loader')
+      if (!loaderEl) return
+      // Kill any lingering child tweens that could compete for compositor time
+      gsap.killTweensOf('.loader__cycle-word')
+      gsap.killTweensOf('.loader__bar')
+      // Trigger CSS slide-up
+      loaderEl.classList.add('is-leaving')
+      // Cleanup after the CSS animation finishes
+      setTimeout(() => {
+        loaderEl.style.display = 'none'
+        ScrollTrigger.refresh()
+        setPageReady(true)
+      }, 900)
+    }, null, '+=0.2')
 
     return () => {
       lenis.destroy()
@@ -145,16 +167,49 @@ function App() {
     <div ref={appRef} className="app">
       {/* ═══ Preloader ═══ */}
       <div ref={loaderRef} className="loader">
-        <div className="loader__content">
-          <div className="loader__logo">
-            <div className="loader__text">CLOSET</div>
-            <div className="loader__x-group">
-              <span className="loader__text loader__text--blue">X</span>
-              <span className="loader__x-suffix" />
-            </div>
+        {/* Top meta bar */}
+        <div className="loader__meta loader__meta--top">
+          <span className="loader__meta-cell">CLOSETX / 2025</span>
+          <span className="loader__meta-cell">FASHION · DELIVERED</span>
+          <span className="loader__meta-cell loader__meta-cell--right">
+            INDEX 01 — INITIATING
+          </span>
+        </div>
+
+        {/* Center stack */}
+        <div className="loader__center">
+          <pre className="loader__ascii" aria-hidden="true">
+{`██████ ██     ████  ██████ ██████ ██████ ██   ██
+██     ██    ██  ██ ██     ██       ██     ██ ██
+██     ██    ██  ██ ██████ ██████   ██      ███
+██     ██    ██  ██     ██ ██       ██     ██ ██
+██████ █████  ████  ██████ ██████   ██    ██   ██`}
+          </pre>
+
+          <div className="loader__cycle">
+            <span className="loader__cycle-bracket">[</span>
+            <span className="loader__cycle-word">X</span>
+            <span className="loader__cycle-cursor" />
+            <span className="loader__cycle-bracket">]</span>
+          </div>
+        </div>
+
+        {/* Bottom progress + meta */}
+        <div className="loader__foot">
+          <div className="loader__foot-row">
+            <span className="loader__foot-label">LOADING ASSETS</span>
+            <span className="loader__foot-counter">
+              <span className="loader__foot-current">000</span>
+              <span className="loader__foot-sep">/</span>
+              <span>100</span>
+            </span>
           </div>
           <div className="loader__progress">
             <div className="loader__bar" />
+          </div>
+          <div className="loader__foot-row loader__foot-row--mute">
+            <span>INDORE · WORLDWIDE</span>
+            <span>v0.1.0</span>
           </div>
         </div>
       </div>

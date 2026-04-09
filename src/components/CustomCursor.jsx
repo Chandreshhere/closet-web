@@ -67,6 +67,15 @@ export default function CustomCursor() {
   const cursorRef = useRef(null)
   const trailRef = useRef(null)
 
+  // Don't render on touch / coarse-pointer devices
+  if (
+    typeof window !== 'undefined' &&
+    (window.matchMedia('(hover: none), (pointer: coarse)').matches ||
+      window.innerWidth < 900)
+  ) {
+    return null
+  }
+
   useEffect(() => {
     const cursor = cursorRef.current
     const trail = trailRef.current

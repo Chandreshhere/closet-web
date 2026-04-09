@@ -26,6 +26,8 @@ const PER_ROW = 9
 const ROWS = 8
 
 export default function ScrollGrid() {
+  const wrapRef = useRef(null)
+  const headingRef = useRef(null)
   const sectionRef = useRef(null)
   const rowsRef = useRef([])
   const startW = useRef(125)
@@ -33,7 +35,9 @@ export default function ScrollGrid() {
 
   useEffect(() => {
     const section = sectionRef.current
-    if (!section) return
+    const wrap = wrapRef.current
+    const heading = headingRef.current
+    if (!section || !wrap || !heading) return
     const rows = rowsRef.current
     const isMobile = window.innerWidth < 1000
     startW.current = isMobile ? 250 : 125
@@ -67,6 +71,21 @@ export default function ScrollGrid() {
     gsap.ticker.add(update)
     update()
 
+    // Smooth eased "pin" — translate heading down as the wrap scrolls,
+    // so it stays near the top of the viewport but eases in/out instead
+    // of the snap-stick behavior of position:sticky or ScrollTrigger pin.
+    const headingTween = gsap.to(heading, {
+      y: () => wrap.offsetHeight - heading.offsetHeight,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: wrap,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.4, // 1.4s smoothing — heading eases toward target instead of snapping
+        invalidateOnRefresh: true,
+      },
+    })
+
     const onResize = () => {
       const m = window.innerWidth < 1000
       startW.current = m ? 250 : 125
@@ -79,6 +98,8 @@ export default function ScrollGrid() {
     window.addEventListener('resize', onResize)
     return () => {
       gsap.ticker.remove(update)
+      headingTween.scrollTrigger?.kill()
+      headingTween.kill()
       window.removeEventListener('resize', onResize)
     }
   }, [])
@@ -94,8 +115,8 @@ export default function ScrollGrid() {
   }
 
   return (
-    <section className="scroll-grid-wrap">
-      <div className="scroll-grid-heading">
+    <section ref={wrapRef} className="scroll-grid-wrap">
+      <div ref={headingRef} className="scroll-grid-heading">
         <p>The Drop / Scroll to expand</p>
         <h2>Closet, in motion.</h2>
       </div>

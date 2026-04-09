@@ -296,3 +296,12 @@
     margin: 40px 0 30px;
   }
 }
+
+@media (max-width: 480px) {
+  .footer { padding: 36px 18px 18px; }
+  .footer__logo-row { font-size: clamp(3rem, 22vw, 7rem); margin: 28px 0 22px; }
+  .footer__headline-line { font-size: clamp(1.6rem, 8vw, 2.6rem); }
+  .footer__nav-cols { gap: 22px; flex-direction: column; }
+  .footer__email { font-size: 0.95rem; word-break: break-all; }
+  .footer__bottom-bar { font-size: 0.65rem; }
+}

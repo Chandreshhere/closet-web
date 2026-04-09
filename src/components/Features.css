@@ -234,3 +234,19 @@
     font-size: 22px;
   }
 }
+
+@media (max-width: 480px) {
+  .features__bg { padding: 32px 14px; }
+  .features__top,
+  .features__bottom { font-size: clamp(2.4rem, 16vw, 5rem); }
+  .features__captions { gap: 18px; flex-direction: column; }
+  .features__bottom-notes { left: 14px; bottom: 24px; font-size: 0.65rem; }
+  .features__cards {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 12px;
+    transform: translateY(-40px);
+  }
+  .feature-card__badge { width: 54px; height: 54px; }
+  .feature-card__badge text { font-size: 18px; }
+}

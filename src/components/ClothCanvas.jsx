@@ -80,7 +80,9 @@ export default function ClothCanvas() {
       hSpacing = usableW / (COLS - 1)
       vSpacing = usableH / (ROWS - 1)
       spacing = (hSpacing + vSpacing) / 2 // average for area-shading reference
-      originX = W * 0.04
+      // Leave enough left padding so the rod's left finial (drawn at
+       // hangerLeft - 24) stays inside the canvas pixel bounds.
+      originX = Math.max(W * 0.06, 48)
       originY = H * 0.15
 
       // Build points (with void flag for non-shirt cells)
@@ -429,7 +431,6 @@ export default function ClothCanvas() {
       </div>
 
       <canvas ref={canvasRef} className="cloth-canvas" />
-      <div className="cloth-canvas-hint">DRAG FABRIC · GRAB ROD TO SLIDE · DOUBLE-CLICK TO RESET</div>
     </div>
   )
 }

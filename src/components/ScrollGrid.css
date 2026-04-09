@@ -7,7 +7,7 @@
 }
 
 .scroll-grid-heading {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 2;
   padding: 6rem 2rem 2rem;
@@ -15,7 +15,6 @@
   pointer-events: none;
   mix-blend-mode: difference;
   will-change: transform;
-  transform: translateZ(0);
 }
 
 .scroll-grid-heading p {
@@ -84,4 +83,18 @@
 @media (max-width: 1000px) {
   .scroll-grid-row { width: 250%; gap: 0.5rem; }
   .scroll-grid-info { font-size: 0.6rem; }
+}
+
+@media (max-width: 768px) {
+  .scroll-grid-heading { padding: 4rem 1.25rem 1.25rem; }
+  .scroll-grid-heading h2 { font-size: clamp(2rem, 9vw, 3.5rem); }
+  .scroll-grid-heading p { font-size: 0.7rem; }
+  .scroll-grid-row { width: 320%; gap: 0.4rem; }
+  .scroll-grid-info { font-size: 0.5rem; }
+}
+
+@media (max-width: 480px) {
+  .scroll-grid-heading { padding: 3rem 1rem 1rem; }
+  .scroll-grid-heading h2 { font-size: clamp(1.8rem, 10vw, 2.6rem); }
+  .scroll-grid-row { width: 400%; gap: 0.35rem; }
 }

@@ -5,6 +5,16 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ClosetX — Fashion, Delivered in Minutes</title>
+
+    <!-- Preconnect Sketchfab + assets so model starts loading immediately -->
+    <link rel="dns-prefetch" href="https://sketchfab.com" />
+    <link rel="preconnect" href="https://sketchfab.com" crossorigin />
+    <link rel="dns-prefetch" href="https://media.sketchfab.com" />
+    <link rel="preconnect" href="https://media.sketchfab.com" crossorigin />
+    <link rel="dns-prefetch" href="https://static.sketchfab.com" />
+    <link rel="preconnect" href="https://static.sketchfab.com" crossorigin />
+    <!-- Preload the actual model embed URL early -->
+    <link rel="prefetch" href="https://sketchfab.com/models/0d818bbea6424343a260bd8bd6dcb17d/embed?autostart=1" as="document" />
   </head>
   <body>
     <div id="root"></div>

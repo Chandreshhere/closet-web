@@ -30,7 +30,7 @@ const features = [
     title: 'Swipe Discovery',
     desc: 'Swipe right to save, left to skip. Find your style fast — like dating but for fashion.',
     num: '03',
-    location: 'Mumbai',
+    location: 'Indore',
     role: 'Personalization',
   },
   {

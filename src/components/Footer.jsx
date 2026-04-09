@@ -213,7 +213,7 @@ export default function Footer() {
             </svg>
           </a>
 
-          <span className="footer__city">MUMBAI · WORLDWIDE</span>
+          <span className="footer__city">INDORE · WORLDWIDE</span>
         </div>
       </div>
 
