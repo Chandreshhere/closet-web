@@ -6,7 +6,7 @@ export default function Hero() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
     <section className="hero" id="hero">
-      <ClothCanvas />
+      {/* <ClothCanvas /> */}
       {/* ─── Top row: ASCII brand · nav · contact ─── */}
       <header className={`hero__top ${menuOpen ? 'is-open' : ''}`}>
         <button
