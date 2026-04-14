@@ -44,11 +44,11 @@ function App() {
     // ═══ Lenis Smooth Scroll ═══
     // Buttery scroll: lerp-based Lenis (more responsive, less easing lag)
     const lenis = new Lenis({
-      lerp: 0.085,
+      lerp: 0.1,
       smoothWheel: true,
       smoothTouch: false,
       wheelMultiplier: 1,
-      touchMultiplier: 1.5,
+      touchMultiplier: 1,
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       syncTouch: false,
@@ -86,8 +86,8 @@ function App() {
     setWord('X')
 
     const WORDS = ['XPRESS', 'XCLUSIVE', 'XTRA', 'XPERIENCE', 'X']
-    const HOLD = 0.5
-    const totalLoaderDur = WORDS.length * HOLD + 0.4
+    const HOLD = 0.45  // Slightly faster word transitions
+    const totalLoaderDur = WORDS.length * HOLD + 0.3
     // Make sure nothing is left invisible by a prior dev-mode mount
     gsap.set(
       '.loader__ascii, .loader__cycle, .loader__meta--top .loader__meta-cell, .loader__foot > *',
@@ -138,24 +138,35 @@ function App() {
       `-=${totalLoaderDur}`
     )
 
-    // Hand off to a CSS-only slide so the exit runs on the compositor with
-    // zero JS-frame work — eliminates jitter from GSAP/lenis/scrolltrigger
-    // updating during the same frames as the slide.
+    // Loader exit — CSS compositor slide (no JS work during the animation).
+    // We pause the GSAP ticker AND tell the cloth canvas to stop rendering
+    // so NOTHING competes with the compositor during the 800ms slide-up.
     tl.call(() => {
       const loaderEl = document.querySelector('.loader')
       if (!loaderEl) return
-      // Kill any lingering child tweens that could compete for compositor time
+
       gsap.killTweensOf('.loader__cycle-word')
       gsap.killTweensOf('.loader__bar')
-      // Trigger CSS slide-up
+
+      // Signal cloth canvas to skip render calls (physics keeps running)
+      document.dispatchEvent(new Event('closetx:loader-exiting'))
+
+      // Pause GSAP ticker → Lenis + ScrollTrigger go idle during the slide
+      gsap.ticker.sleep()
+
       loaderEl.classList.add('is-leaving')
-      // Cleanup after the CSS animation finishes
+
       setTimeout(() => {
         loaderEl.style.display = 'none'
-        ScrollTrigger.refresh()
-        setPageReady(true)
-      }, 900)
-    }, null, '+=0.2')
+        gsap.ticker.wake()
+        // Dispatch event BEFORE ScrollTrigger refresh to allow cloth to start rendering
+        document.dispatchEvent(new Event('closetx:loader-done'))
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh()
+          setPageReady(true)
+        })
+      }, 750)  // Slightly faster exit
+    }, null, '+=0.15')  // Start exit sooner
 
     return () => {
       lenis.destroy()

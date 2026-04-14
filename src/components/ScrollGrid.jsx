@@ -52,20 +52,29 @@ export default function ScrollGrid() {
     const pad = parseFloat(getComputedStyle(section).paddingTop) || 0
     section.style.height = `${expandedRowH * rows.length + gap * (rows.length - 1) + pad * 2}px`
 
+    // Cache absolute row positions once — avoids getBoundingClientRect() every frame
+    // (calling it per-row per-frame forces 8 layout recalcs per rAF = major jank)
+    let rowTops = []
+    let rowHeights = []
+    const cachePositions = () => {
+      const sy = window.scrollY
+      rows.forEach((row, i) => {
+        const rect = row.getBoundingClientRect()
+        rowTops[i] = rect.top + sy
+        rowHeights[i] = rect.height
+      })
+    }
+    cachePositions()
+
     function update() {
       const sy = window.scrollY
       const vh = window.innerHeight
-      rows.forEach((row) => {
-        const rect = row.getBoundingClientRect()
-        const top = rect.top + sy
-        const bot = top + rect.height
-        const s = top - vh
-        const e = bot
+      rows.forEach((row, i) => {
+        const s = rowTops[i] - vh
+        const e = rowTops[i] + rowHeights[i]
         let p = (sy - s) / (e - s)
         p = Math.max(0, Math.min(1, p))
-        row.style.width = `${
-          startW.current + (endW.current - startW.current) * p
-        }%`
+        row.style.width = `${startW.current + (endW.current - startW.current) * p}%`
       })
     }
     gsap.ticker.add(update)
@@ -94,6 +103,7 @@ export default function ScrollGrid() {
       const h = firstRow.offsetHeight
       firstRow.style.width = ''
       section.style.height = `${h * rows.length + gap * (rows.length - 1) + pad * 2}px`
+      cachePositions() // refresh cached positions after layout change
     }
     window.addEventListener('resize', onResize)
     return () => {
@@ -117,7 +127,6 @@ export default function ScrollGrid() {
   return (
     <section ref={wrapRef} className="scroll-grid-wrap">
       <div ref={headingRef} className="scroll-grid-heading">
-        <p>The Drop / Scroll to expand</p>
         <h2>Closet, in motion.</h2>
       </div>
       <section ref={sectionRef} className="scroll-grid">

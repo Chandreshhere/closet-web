@@ -20,24 +20,23 @@ export default function Footer() {
       const duration = video.duration
       if (!duration || isNaN(duration)) return
 
-      // ── 200fps smooth video scrubbing ──
-      // Lenis already smooths scrollY, so we read it each rAF and write
-      // currentTime directly — no double-lerp lag. Snap to a 200fps grid
-      // and skip redundant seeks within < 1 frame.
-      const FRAME = 1 / 200
+      // ── 120fps smooth video scrubbing ──
+      const FRAME = 1 / 120
       let targetTime = 0
       let lastWrite = -1
+      let footerVisible = false
+      let rafId = null
 
       // Hint the decoder to keep frames hot
       try { video.playbackRate = 0 } catch (_) {}
 
       const tick = () => {
         if (
+          footerVisible &&
           video.readyState >= 2 &&
           Math.abs(targetTime - lastWrite) >= FRAME
         ) {
           const snapped = Math.round(targetTime / FRAME) * FRAME
-          // requestVideoFrameCallback path is smoother where supported
           if (typeof video.fastSeek === 'function') {
             video.fastSeek(snapped)
           } else {
@@ -45,9 +44,19 @@ export default function Footer() {
           }
           lastWrite = snapped
         }
-        requestAnimationFrame(tick)
+        rafId = requestAnimationFrame(tick)
       }
-      tick()
+
+      // Only run the rAF loop while footer is visible
+      const visObs = new IntersectionObserver(
+        ([entry]) => {
+          footerVisible = entry.isIntersecting
+          if (footerVisible && !rafId) tick()
+        },
+        { threshold: 0.01 }
+      )
+      visObs.observe(footerRef.current)
+      tick() // start immediately; visObs will gate actual seeks
 
       const ctx = gsap.context(() => {
         ScrollTrigger.create({
@@ -95,7 +104,11 @@ export default function Footer() {
         )
       }, footerRef)
 
-      return () => ctx.revert()
+      return () => {
+        ctx.revert()
+        visObs.disconnect()
+        if (rafId) cancelAnimationFrame(rafId)
+      }
     }
 
     let cleanup

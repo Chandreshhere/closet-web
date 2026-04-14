@@ -126,7 +126,7 @@ export default function Features() {
         {features.map((f, i) => (
           <div key={i} className={`feature-card feature-card--${i + 1}`}>
             <div className="feature-card__img-wrap">
-              <img src={f.img} alt={f.title} className="feature-card__img" />
+              <img src={f.img} alt={f.title} className="feature-card__img" loading="lazy" decoding="async" />
               {/* Rotating circular badge */}
               <div className="feature-card__badge">
                 <svg viewBox="0 0 200 200">

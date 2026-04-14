@@ -13,6 +13,13 @@ html, body {
   overflow-x: clip;
 }
 
+/* Force GPU composite layer on GSAP-animated elements so transforms are
+   handled entirely on the compositor thread — no main-thread jank. */
+[data-gsap], .gsap-animated {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
 /* ═══ Preloader — editorial / award style ═══ */
 .loader {
   position: fixed;
@@ -34,10 +41,13 @@ html, body {
 
 /* CSS-only slide-out — runs entirely on the compositor (no JS frame jitter) */
 .loader.is-leaving {
-  animation: loader-slide-up 0.85s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  animation: loader-slide-up 0.75s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+  /* Disable pointer events immediately so scroll can begin */
+  pointer-events: none;
 }
 @keyframes loader-slide-up {
-  to { transform: translate3d(0, -100%, 0); }
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -100%, 0); }
 }
 
 .loader * { opacity: 1; }

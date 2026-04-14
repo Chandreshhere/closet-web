@@ -8,6 +8,8 @@
   pointer-events: auto;
   z-index: 2;
   overflow: visible;
+  will-change: transform;
+  contain: layout style paint;
 }
 
 .cloth-canvas {
@@ -18,6 +20,7 @@
   cursor: grab;
   display: block;
   z-index: 3;
+  will-change: transform;
 }
 
 /* Black bar sitting between the 3D rack (z:1) and the curtain canvas (z:3),
@@ -28,7 +31,7 @@
   cursor: grabbing;
 }
 
-.cloth-sketchfab {
+.cloth-model-container {
   position: absolute;
   top: 14%;
   left: 1%;
@@ -36,37 +39,60 @@
   height: 74%;
   max-height: calc(100% - 22%);
   z-index: 1;
+  pointer-events: auto;
+  overflow: hidden;
+  will-change: transform;
+  contain: strict;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.cloth-model-container.model-loaded {
+  opacity: 1;
+}
+
+.cloth-model-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Loading indicator for 3D model */
+.model-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 10;
   pointer-events: none;
+}
+
+.model-loading-bar {
+  width: 200px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.cloth-sketchfab iframe {
-  position: absolute;
-  top: -2%;
-  left: -5%;
-  width: 110%;
-  height: 140%;
-  display: block;
-  border: 0;
-  opacity: 0;
-  transition: opacity 0.6s ease;
+.model-loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6f80ff, #8f9fff);
+  transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
-.cloth-sketchfab__iframe--ready {
-  opacity: 1 !important;
-}
-
-/* Mask bottom-left so the Sketchfab cube logo is hidden */
-.cloth-sketchfab::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 70px;
-  height: 60px;
-  background: #000;
-  pointer-events: none;
-  z-index: 2;
+.model-loading-text {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
+  font-variant-numeric: tabular-nums;
 }
 
 .cloth-canvas-hint {
@@ -92,7 +118,7 @@
     order: 5;
     margin-top: 1.5rem;
   }
-  .cloth-sketchfab {
+  .cloth-model-container {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -101,15 +127,8 @@
     top: 0;
     left: 0;
   }
-  .cloth-sketchfab iframe {
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  }
 }
 
 @media (max-width: 480px) {
   .cloth-canvas-wrap { height: 42vh; }
-  .cloth-sketchfab::after { width: 50px; height: 42px; }
 }
