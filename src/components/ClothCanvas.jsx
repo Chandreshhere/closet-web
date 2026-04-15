@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import './ClothCanvas.css'
 
@@ -9,136 +10,160 @@ export default function ClothCanvas() {
   const modelContainerRef = useRef(null)
   const frozenRef = useRef(false)
 
-  // Stick canvas above the blue marquee — freeze everything past that point
+  // ── Canvas freeze / unfreeze on scroll ───────────────────────────
   useEffect(() => {
     const wrap = wrapRef.current
+    if (!wrap) return
+
+    let ticking = false
+
     const onScroll = () => {
-      if (!wrap) return
-      const mobile = window.innerWidth < 900
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        ticking = false
+        const mobile = window.innerWidth < 900
 
-      if (mobile) {
-        // Use getBoundingClientRect for accurate document position
-        const marqEl = document.getElementById('marquee-white')
+        if (mobile) {
+          const marqEl = document.getElementById('marquee-white')
+          if (!marqEl) return
+          const marqDocTop = marqEl.getBoundingClientRect().top + window.scrollY
+          const stickyAt = marqDocTop - window.innerHeight
+
+          if (window.scrollY >= stickyAt) {
+            if (!frozenRef.current) {
+              const rect = wrap.getBoundingClientRect()
+              frozenRef.current = true
+              wrap.style.position = 'absolute'
+              wrap.style.top = `${window.scrollY + rect.top}px`
+              wrap.style.height = `${rect.height}px`
+            }
+          } else {
+            if (frozenRef.current) {
+              frozenRef.current = false
+              wrap.style.position = 'fixed'
+              wrap.style.top = ''
+              wrap.style.height = ''
+            }
+          }
+          return
+        }
+
+        // Desktop
+        const marqEl = document.getElementById('marquee-blue')
         if (!marqEl) return
-        // True document top of the white marquee
-        const marqDocTop = marqEl.getBoundingClientRect().top + window.scrollY
-        // Freeze when the white marquee enters the bottom of the viewport
-        const stickyAt = marqDocTop - window.innerHeight
-
+        const stickyAt = marqEl.offsetTop - window.innerHeight
         if (window.scrollY >= stickyAt) {
           if (!frozenRef.current) {
-            // Pin canvas exactly where it is visually — no drop
-            const rect = wrap.getBoundingClientRect()
             frozenRef.current = true
             wrap.style.position = 'absolute'
-            wrap.style.top = `${window.scrollY + rect.top}px`
-            wrap.style.height = `${rect.height}px`
+            wrap.style.top = `${stickyAt}px`
+            wrap.style.height = `${window.innerHeight}px`
           }
         } else {
-          frozenRef.current = false
-          wrap.style.position = 'fixed'
-          wrap.style.top = ''
-          wrap.style.height = ''
+          if (frozenRef.current) {
+            frozenRef.current = false
+            wrap.style.position = 'fixed'
+            wrap.style.top = '0'
+            wrap.style.height = '100%'
+          }
         }
-        return
-      }
-
-      // Desktop: freeze at blue marquee
-      const marqEl = document.getElementById('marquee-blue')
-      if (!marqEl) return
-      const stickyAt = marqEl.offsetTop - window.innerHeight
-      if (window.scrollY >= stickyAt) {
-        frozenRef.current = true
-        wrap.style.position = 'absolute'
-        wrap.style.top = `${stickyAt}px`
-        wrap.style.height = `${window.innerHeight}px`
-      } else {
-        frozenRef.current = false
-        wrap.style.position = 'fixed'
-        wrap.style.top = '0'
-        wrap.style.height = '100%'
-      }
+      })
     }
+
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Three.js 3D Model Scene — starts loading immediately in background
+  // ── Three.js Scene ───────────────────────────────────────────────
   useEffect(() => {
-    if (!modelContainerRef.current) return
-
     const container = modelContainerRef.current
+    if (!container) return
+
+    // Cache device type once — never recalculate per frame
+    const mobile = window.innerWidth < 900
     const W = () => container.clientWidth
     const H = () => container.clientHeight
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    // ── Renderer: mobile = lightweight, desktop = quality ──
+    const renderer = new THREE.WebGLRenderer({
+      antialias: !mobile,          // antialias OFF on mobile
+      alpha: true,
+      powerPreference: 'high-performance',
+      precision: mobile ? 'mediump' : 'highp',
+    })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1 : 2))
     renderer.setSize(W(), H())
     renderer.setClearColor(0x000000, 0)
-    renderer.shadowMap.enabled = true
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    renderer.shadowMap.enabled = !mobile   // shadows OFF on mobile
+    if (!mobile) renderer.shadowMap.type = THREE.PCFSoftShadowMap
     container.appendChild(renderer.domElement)
 
-    // Scene & Camera
+    // ── Scene ──
     const scene = new THREE.Scene()
-    const isMobile = () => window.innerWidth < 900
-    const camera = new THREE.PerspectiveCamera(isMobile() ? 65 : 45, W() / H(), 0.1, 100)
-    if (isMobile()) {
-      camera.position.set(0, 1.2, 5.5)
-    } else {
-      camera.position.set(0, 1.6, 3.8)
-    }
+
+    // ── Camera ──
+    const camera = new THREE.PerspectiveCamera(
+      mobile ? 65 : 45,
+      W() / H(),
+      0.1,
+      100
+    )
+    camera.position.set(0, mobile ? 1.2 : 1.6, mobile ? 5.5 : 3.8)
     camera.lookAt(0, 1, 0)
 
-    // OrbitControls
+    // ── Controls ──
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = false
     controls.enableZoom = false
     controls.enablePan = false
     controls.enableRotate = false
     controls.autoRotate = false
-    controls.autoRotateSpeed = 0
     controls.target.set(0, 1, 0)
     controls.update()
 
-    // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6)
-    scene.add(ambient)
+    // ── Lights ──
+    scene.add(new THREE.AmbientLight(0xffffff, mobile ? 1.2 : 0.6))
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.2)
+    const key = new THREE.DirectionalLight(0xffffff, mobile ? 1.0 : 1.2)
     key.position.set(3, 5, 4)
-    key.castShadow = true
-    key.shadow.mapSize.width = 1024
-    key.shadow.mapSize.height = 1024
+    if (!mobile) {
+      key.castShadow = true
+      key.shadow.mapSize.width = 512
+      key.shadow.mapSize.height = 512
+    }
     scene.add(key)
 
-    const rim = new THREE.DirectionalLight(0x6f80ff, 0.8)
+    const rim = new THREE.DirectionalLight(0x6f80ff, mobile ? 0.5 : 0.8)
     rim.position.set(-4, 3, -2)
     scene.add(rim)
 
-    const fill = new THREE.PointLight(0xffffff, 0.4, 15)
-    fill.position.set(-2, 1, 3)
-    scene.add(fill)
+    if (!mobile) {
+      const fill = new THREE.PointLight(0xffffff, 0.4, 15)
+      fill.position.set(-2, 1, 3)
+      scene.add(fill)
+    }
 
-    // Load GLB Model
+    // ── Model ──
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/gltf/')
     const loader = new GLTFLoader()
+    loader.setDRACOLoader(dracoLoader)
     let model = null
     let mixer = null
 
     loader.load(
-      '/realistic_human_cloths.glb',
+      '/realistic_human_cloths_opt.glb',
       (gltf) => {
         model = gltf.scene
 
         const box = new THREE.Box3().setFromObject(model)
         const center = box.getCenter(new THREE.Vector3())
         const size = box.getSize(new THREE.Vector3())
-
         const maxDim = Math.max(size.x, size.y, size.z)
         const scale = 2.8 / maxDim
-        model.scale.setScalar(scale)
 
+        model.scale.setScalar(scale)
         model.position.x = -center.x * scale - 1.2
         model.position.y = -box.min.y * scale - 1.4
         model.position.z = -center.z * scale
@@ -146,123 +171,176 @@ export default function ClothCanvas() {
 
         model.traverse((child) => {
           if (child.isMesh) {
-            child.castShadow = true
-            child.receiveShadow = true
+            if (!mobile) {
+              child.castShadow = true
+              child.receiveShadow = true
+            }
+            // Reduce texture quality on mobile
+            if (mobile && child.material) {
+              const mats = Array.isArray(child.material)
+                ? child.material
+                : [child.material]
+              mats.forEach((m) => {
+                if (m.map) m.map.anisotropy = 1
+              })
+            }
           }
         })
 
         scene.add(model)
 
-        if (gltf.animations && gltf.animations.length > 0) {
+        if (gltf.animations?.length > 0) {
           mixer = new THREE.AnimationMixer(model)
-          gltf.animations.forEach((clip) => {
-            mixer.clipAction(clip).play()
-          })
+          gltf.animations.forEach((clip) => mixer.clipAction(clip).play())
         }
 
         container.classList.add('model-loaded')
       },
       undefined,
-      (error) => {
-        console.error('Error loading 3D model:', error)
-      }
+      (err) => console.warn('GLB load error:', err)
     )
 
-    // Scroll-driven: model travels left (hero) → right (about)
+    // ── Scroll-driven animation state ──
     let scrollProgress = 0
-    let targetXOffset = isMobile() ? 0 : -1.2
+    let targetXOffset = mobile ? 0 : -1.2
     let targetRotY = 0
 
     const onScroll = () => {
-      if (frozenRef.current) return   // frozen — don't touch model
+      if (frozenRef.current) return
 
       const heroEl = document.getElementById('hero')
       const aboutEl = document.getElementById('about')
       if (!heroEl || !aboutEl) return
 
       const heroH = heroEl.offsetHeight
-      const aboutTop = aboutEl.offsetTop
-      const aboutH = aboutEl.offsetHeight
       const scrollY = window.scrollY
-      const mobile = isMobile()
 
       if (scrollY <= heroH) {
-        // In hero: zoom on scroll
         scrollProgress = scrollY / heroH
         targetXOffset = mobile ? 0 : -1.2
-        // Mobile rotates right (negative), desktop rotates left (positive)
         targetRotY = mobile
           ? -scrollProgress * Math.PI * 0.4
           : scrollProgress * Math.PI * 0.4
-      } else if (!mobile && scrollY <= aboutTop + aboutH * 0.6) {
-        // Desktop only: slide model right entering about section
-        const t = Math.min(1, (scrollY - heroH) / (aboutTop + aboutH * 0.3 - heroH))
-        scrollProgress = 1
-        targetXOffset = -1.2 + t * 3.8
-        targetRotY = Math.PI * 0.4 + t * Math.PI * 0.5
-      } else {
-        targetXOffset = mobile ? 0 : -1.2
-        targetRotY = 0
+      } else if (!mobile) {
+        const aboutTop = aboutEl.offsetTop
+        const aboutH = aboutEl.offsetHeight
+        if (scrollY <= aboutTop + aboutH * 0.6) {
+          const t = Math.min(1, (scrollY - heroH) / (aboutTop + aboutH * 0.3 - heroH))
+          scrollProgress = 1
+          targetXOffset = -1.2 + t * 3.8
+          targetRotY = Math.PI * 0.4 + t * Math.PI * 0.5
+        } else {
+          targetXOffset = -1.2
+          targetRotY = 0
+        }
       }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 
-    // Animation loop
-    let raf
-    const clock = new THREE.Clock()
-    const animate = () => {
-      const delta = clock.getDelta()
+    // ── Animation loop — pauses when hidden ──
+    let raf = null
+    let isRendering = true
+
+    const tick = () => {
+      if (!isRendering) return
+      raf = requestAnimationFrame(tick)
+
+      const delta = Math.min(clock.getDelta(), 0.05) // cap delta to avoid spiral
       if (mixer) mixer.update(delta)
 
-      const onMobile = window.innerWidth < 900
-
-      if (!onMobile) {
-        // Desktop only: scroll-driven zoom
+      if (!mobile) {
         const targetZ = 3.8 - scrollProgress * 1.5
-        camera.position.z += (targetZ - camera.position.z) * 0.15
+        camera.position.z += (targetZ - camera.position.z) * 0.12
       }
 
       if (model) {
-        if (onMobile) {
-          // Center model (remove desktop -1.2 x offset) and spin in place
+        if (mobile) {
           const baseX = model._baseX ?? 0
           model.position.x += (baseX - model.position.x) * 0.08
           model.rotation.y += 0.008
         } else {
-          // Desktop: scroll-driven x slide + rotation
           const baseX = model._baseX ?? 0
-          const desiredX = baseX + targetXOffset
-          model.position.x += (desiredX - model.position.x) * 0.06
+          model.position.x += (baseX + targetXOffset - model.position.x) * 0.06
           model.rotation.y += (targetRotY - model.rotation.y) * 0.06
         }
       }
 
-      controls.update()
       renderer.render(scene, camera)
-      raf = requestAnimationFrame(animate)
     }
-    animate()
 
-    // Resize handler
-    const onResize = () => {
-      renderer.setSize(W(), H())
-      camera.aspect = W() / H()
-      if (isMobile()) {
-        camera.fov = 65
-        camera.position.set(0, 1.2, 5.5)
+    const clock = new THREE.Clock()
+    tick()
+
+    // ── Pause when tab hidden ──
+    const onVisibility = () => {
+      if (document.hidden) {
+        isRendering = false
+        cancelAnimationFrame(raf)
       } else {
-        camera.fov = 45
-        camera.position.set(0, 1.6, 3.8)
+        isRendering = true
+        clock.getDelta() // flush stale delta
+        tick()
       }
-      camera.updateProjectionMatrix()
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    // ── Pause when scrolled far off-screen ──
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (!isRendering && !document.hidden) {
+            isRendering = true
+            clock.getDelta()
+            tick()
+          }
+        } else {
+          isRendering = false
+          cancelAnimationFrame(raf)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    observer.observe(container)
+
+    // ── Loader events ──
+    document.addEventListener('closetx:loader-exiting', () => {
+      isRendering = false
+      cancelAnimationFrame(raf)
+    })
+    document.addEventListener('closetx:loader-done', () => {
+      if (!document.hidden) {
+        isRendering = true
+        clock.getDelta()
+        tick()
+      }
+    })
+
+    // ── Throttled resize ──
+    let resizeTimer = null
+    const onResize = () => {
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(() => {
+        renderer.setSize(W(), H())
+        camera.aspect = W() / H()
+        const isMob = window.innerWidth < 900
+        camera.fov = isMob ? 65 : 45
+        if (!isRendering) camera.position.set(0, isMob ? 1.2 : 1.6, isMob ? 5.5 : 3.8)
+        camera.updateProjectionMatrix()
+      }, 100)
     }
     window.addEventListener('resize', onResize)
 
+    // ── Cleanup ──
     return () => {
+      isRendering = false
       cancelAnimationFrame(raf)
+      clearTimeout(resizeTimer)
       window.removeEventListener('scroll', onScroll)
-      controls.dispose()
       window.removeEventListener('resize', onResize)
+      document.removeEventListener('visibilitychange', onVisibility)
+      observer.disconnect()
+      controls.dispose()
+      dracoLoader.dispose()
       renderer.dispose()
       if (renderer.domElement.parentNode === container) {
         container.removeChild(renderer.domElement)
@@ -270,11 +348,13 @@ export default function ClothCanvas() {
       scene.traverse((obj) => {
         if (obj.geometry) obj.geometry.dispose()
         if (obj.material) {
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach(mat => mat.dispose())
-          } else {
-            obj.material.dispose()
-          }
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material]
+          mats.forEach((m) => {
+            Object.values(m).forEach((v) => {
+              if (v?.isTexture) v.dispose()
+            })
+            m.dispose()
+          })
         }
       })
     }
