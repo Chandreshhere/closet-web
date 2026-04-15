@@ -14,7 +14,11 @@
       ]
     }
   ],
-  "rewrites": [],
+  "functions": {
+    "api/contact.js": {
+      "maxDuration": 10
+    }
+  },
   "cleanUrls": true,
   "trailingSlash": false
 }

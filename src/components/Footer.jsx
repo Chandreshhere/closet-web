@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { InstagramIcon, TwitterIcon, TiktokIcon } from './Icons'
+import ContactForm from './ContactForm'
 import './Footer.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -11,6 +12,9 @@ export default function Footer() {
   const videoRef = useRef(null)
   const contentRef = useRef(null)
   const headlineRef = useRef(null)
+  const [formOpen, setFormOpen] = useState(false)
+  const openForm = useCallback(() => setFormOpen(true), [])
+  const closeForm = useCallback(() => setFormOpen(false), [])
 
   useEffect(() => {
     const video = videoRef.current
@@ -137,7 +141,8 @@ export default function Footer() {
   }, [])
 
   return (
-    <footer ref={footerRef} className="footer">
+    <>
+    <footer ref={footerRef} className="footer" id="contact">
       {/* Scroll-scrubbed background video */}
       <div className="footer__video-wrap">
         <video
@@ -203,28 +208,23 @@ export default function Footer() {
         </div>
 
         <div className="footer__col footer__col--right">
-          <span className="footer__col-label">(CONTACT)</span>
-
           <div className="footer__contact-block">
-            <span className="footer__contact-label">FOR PRESS &amp; PARTNERSHIPS:</span>
-            <a href="mailto:hello@closetx.in" className="footer__email">
-              hello@closetx.in
-            </a>
+            <span className="footer__email">Akshat Jain</span>
           </div>
 
           <div className="footer__contact-block">
-            <span className="footer__contact-label">FOR ORDER SUPPORT (PLEASE INCLUDE ORDER #):</span>
-            <a href="mailto:support@closetx.in" className="footer__email">
-              support@closetx.in
+            <span className="footer__contact-label">PHONE:</span>
+            <a href="tel:+919926446622" className="footer__email">
+              +91 99264 46622
             </a>
           </div>
 
-          <a href="#contact-form" className="footer__form-btn">
-            OR USE FORM HERE
+          <button className="footer__form-btn" onClick={openForm}>
+            GET IN TOUCH
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12H19M19 12L12 5M19 12L12 19" />
             </svg>
-          </a>
+          </button>
 
           <span className="footer__city">INDORE · WORLDWIDE</span>
         </div>
@@ -233,9 +233,12 @@ export default function Footer() {
       {/* Bottom bar */}
       <div className="footer__bottom-bar">
         <span>© {new Date().getFullYear()} CLOSETX</span>
-        <span className="footer__bottom-mid">FASHION DELIVERY · 30—60 MIN</span>
+        <span className="footer__bottom-mid">FASHION DELIVERY · 60 MIN</span>
         <span>ALL RIGHTS RESERVED</span>
       </div>
     </footer>
+
+    <ContactForm isOpen={formOpen} onClose={closeForm} />
+    </>
   )
 }

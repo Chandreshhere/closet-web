@@ -54,6 +54,7 @@ function App() {
       gestureOrientation: 'vertical',
       syncTouch: false,
     })
+    window.__lenis = lenis
 
     // Bridge Lenis ↔ ScrollTrigger so all scroll-bound animations stay in sync
     lenis.on('scroll', ScrollTrigger.update)
@@ -170,6 +171,7 @@ function App() {
     }, null, '+=0.15')  // Start exit sooner
 
     return () => {
+      window.__lenis = null
       lenis.destroy()
       gsap.ticker.remove(lenis.raf)
     }

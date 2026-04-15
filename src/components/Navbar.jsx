@@ -40,7 +40,12 @@ export default function Navbar({ theme, toggleTheme }) {
 
   const scrollTo = (id) => {
     const el = document.getElementById(id)
-    if (el) el.scrollIntoView({ behavior: 'smooth' })
+    if (!el) return
+    if (window.__lenis) {
+      window.__lenis.scrollTo(el, { offset: 0, duration: 1.2, easing: (t) => 1 - Math.pow(1 - t, 4) })
+    } else {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
     setMenuOpen(false)
   }
 
@@ -58,13 +63,16 @@ export default function Navbar({ theme, toggleTheme }) {
         <button className="pill-btn" onClick={() => scrollTo('about')}>
           ABOUT
         </button>
+        <button className="pill-btn" onClick={() => scrollTo('how-it-works')}>
+          HOW IT WORKS
+        </button>
         <button className="pill-btn" onClick={() => scrollTo('contact')}>
           CONTACT
         </button>
       </div>
 
       <div className="navbar__right">
-        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('download')}>
+        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('contact')}>
           GET APP
         </button>
         <button
@@ -87,16 +95,25 @@ export default function Navbar({ theme, toggleTheme }) {
 
       {/* Mobile menu overlay */}
       <div className={`navbar__mobile-menu ${menuOpen ? 'navbar__mobile-menu--open' : ''}`}>
+        <button className="pill-btn" onClick={() => scrollTo('hero')}>
+          HOME
+        </button>
         <button className="pill-btn" onClick={() => scrollTo('features')}>
           FEATURES
         </button>
         <button className="pill-btn" onClick={() => scrollTo('about')}>
           ABOUT
         </button>
+        <button className="pill-btn" onClick={() => scrollTo('how-it-works')}>
+          HOW IT WORKS
+        </button>
+        <button className="pill-btn" onClick={() => scrollTo('brands')}>
+          BRANDS
+        </button>
         <button className="pill-btn" onClick={() => scrollTo('contact')}>
           CONTACT
         </button>
-        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('download')}>
+        <button className="pill-btn navbar__get-app" onClick={() => scrollTo('contact')}>
           GET APP
         </button>
       </div>

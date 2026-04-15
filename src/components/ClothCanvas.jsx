@@ -96,7 +96,7 @@ export default function ClothCanvas() {
     renderer.setSize(W(), H())
     renderer.setClearColor(0x000000, 0)
     renderer.shadowMap.enabled = !mobile   // shadows OFF on mobile
-    if (!mobile) renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    if (!mobile) renderer.shadowMap.type = THREE.PCFShadowMap
     container.appendChild(renderer.domElement)
 
     // ── Scene ──
@@ -245,7 +245,8 @@ export default function ClothCanvas() {
       if (!isRendering) return
       raf = requestAnimationFrame(tick)
 
-      const delta = Math.min(clock.getDelta(), 0.05) // cap delta to avoid spiral
+      clock.update()
+      const delta = Math.min(clock.getDelta(), 0.05)
       if (mixer) mixer.update(delta)
 
       if (!mobile) {
@@ -268,7 +269,7 @@ export default function ClothCanvas() {
       renderer.render(scene, camera)
     }
 
-    const clock = new THREE.Clock()
+    const clock = new THREE.Timer()
     tick()
 
     // ── Pause when tab hidden ──
@@ -278,7 +279,7 @@ export default function ClothCanvas() {
         cancelAnimationFrame(raf)
       } else {
         isRendering = true
-        clock.getDelta() // flush stale delta
+        clock.update() // reset timer on resume
         tick()
       }
     }
@@ -290,7 +291,7 @@ export default function ClothCanvas() {
         if (entry.isIntersecting) {
           if (!isRendering && !document.hidden) {
             isRendering = true
-            clock.getDelta()
+            clock.update()
             tick()
           }
         } else {
@@ -310,7 +311,7 @@ export default function ClothCanvas() {
     document.addEventListener('closetx:loader-done', () => {
       if (!document.hidden) {
         isRendering = true
-        clock.getDelta()
+        clock.update()
         tick()
       }
     })
