@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 
 import CustomCursor from './components/CustomCursor'
+import ClothCanvas from './components/ClothCanvas'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
 import About from './components/About'
@@ -225,6 +226,9 @@ function App() {
         </div>
       </div>
 
+      {/* ═══ 3D Canvas — raw, fixed, hero-only ═══ */}
+      <ClothCanvas />
+
       {/* ═══ Custom Cursor ═══ */}
       <CustomCursor />
 
@@ -233,6 +237,7 @@ function App() {
 
       {/* ═══ Marquee 1 ═══ */}
       <Marquee
+        id="marquee-white"
         texts={[
           'NIKE',
           'ADIDAS',
@@ -256,6 +261,7 @@ function App() {
 
       {/* ═══ Marquee 2 ═══ */}
       <Marquee
+        id="marquee-blue"
         texts={[
           'CLOSETX IS NONTRADITIONAL',
           '30-60 MIN DELIVERY',

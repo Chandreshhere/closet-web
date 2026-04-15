@@ -1,12 +1,12 @@
 import './Marquee.css'
 
-export default function Marquee({ texts, variant = 'default', speed = 30 }) {
+export default function Marquee({ texts, variant = 'default', speed = 30, id }) {
   const items = [...texts, ...texts, ...texts, ...texts]
 
   const classes = variant.split(' ').map(v => `marquee--${v}`).join(' ')
 
   return (
-    <div className={`marquee ${classes}`}>
+    <div id={id} className={`marquee ${classes}`}>
       <div
         className="marquee__track"
         style={{ animationDuration: `${speed}s` }}

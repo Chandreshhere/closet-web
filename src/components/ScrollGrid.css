@@ -3,18 +3,16 @@
   width: 100%;
   background: var(--bg, #0a0a0a);
   color: var(--fg, #fff);
-  /* no overflow:hidden here — it would break position: sticky */
 }
 
 .scroll-grid-heading {
-  position: relative;
+  position: sticky;
   top: 0;
   z-index: 2;
   padding: 6rem 2rem 2rem;
   text-align: center;
   pointer-events: none;
   mix-blend-mode: difference;
-  will-change: transform;
 }
 
 .scroll-grid-heading p {

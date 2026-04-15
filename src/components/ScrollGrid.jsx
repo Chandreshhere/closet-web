@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './ScrollGrid.css'
 
 const ITEMS = [
@@ -23,11 +22,9 @@ const ITEMS = [
 ]
 
 const PER_ROW = 9
-const ROWS = 8
+const ROWS = 5
 
 export default function ScrollGrid() {
-  const wrapRef = useRef(null)
-  const headingRef = useRef(null)
   const sectionRef = useRef(null)
   const rowsRef = useRef([])
   const startW = useRef(125)
@@ -35,9 +32,7 @@ export default function ScrollGrid() {
 
   useEffect(() => {
     const section = sectionRef.current
-    const wrap = wrapRef.current
-    const heading = headingRef.current
-    if (!section || !wrap || !heading) return
+    if (!section) return
     const rows = rowsRef.current
     const isMobile = window.innerWidth < 1000
     startW.current = isMobile ? 250 : 125
@@ -52,26 +47,15 @@ export default function ScrollGrid() {
     const pad = parseFloat(getComputedStyle(section).paddingTop) || 0
     section.style.height = `${expandedRowH * rows.length + gap * (rows.length - 1) + pad * 2}px`
 
-    // Cache absolute row positions once — avoids getBoundingClientRect() every frame
-    // (calling it per-row per-frame forces 8 layout recalcs per rAF = major jank)
-    let rowTops = []
-    let rowHeights = []
-    const cachePositions = () => {
-      const sy = window.scrollY
-      rows.forEach((row, i) => {
-        const rect = row.getBoundingClientRect()
-        rowTops[i] = rect.top + sy
-        rowHeights[i] = rect.height
-      })
-    }
-    cachePositions()
-
     function update() {
       const sy = window.scrollY
       const vh = window.innerHeight
-      rows.forEach((row, i) => {
-        const s = rowTops[i] - vh
-        const e = rowTops[i] + rowHeights[i]
+      rows.forEach((row) => {
+        const rect = row.getBoundingClientRect()
+        const top = rect.top + sy
+        const bot = top + rect.height
+        const s = top - vh
+        const e = bot
         let p = (sy - s) / (e - s)
         p = Math.max(0, Math.min(1, p))
         row.style.width = `${startW.current + (endW.current - startW.current) * p}%`
@@ -79,21 +63,6 @@ export default function ScrollGrid() {
     }
     gsap.ticker.add(update)
     update()
-
-    // Smooth eased "pin" — translate heading down as the wrap scrolls,
-    // so it stays near the top of the viewport but eases in/out instead
-    // of the snap-stick behavior of position:sticky or ScrollTrigger pin.
-    const headingTween = gsap.to(heading, {
-      y: () => wrap.offsetHeight - heading.offsetHeight,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: wrap,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1.4, // 1.4s smoothing — heading eases toward target instead of snapping
-        invalidateOnRefresh: true,
-      },
-    })
 
     const onResize = () => {
       const m = window.innerWidth < 1000
@@ -103,13 +72,10 @@ export default function ScrollGrid() {
       const h = firstRow.offsetHeight
       firstRow.style.width = ''
       section.style.height = `${h * rows.length + gap * (rows.length - 1) + pad * 2}px`
-      cachePositions() // refresh cached positions after layout change
     }
     window.addEventListener('resize', onResize)
     return () => {
       gsap.ticker.remove(update)
-      headingTween.scrollTrigger?.kill()
-      headingTween.kill()
       window.removeEventListener('resize', onResize)
     }
   }, [])
@@ -125,8 +91,9 @@ export default function ScrollGrid() {
   }
 
   return (
-    <section ref={wrapRef} className="scroll-grid-wrap">
-      <div ref={headingRef} className="scroll-grid-heading">
+    <section className="scroll-grid-wrap">
+      <div className="scroll-grid-heading">
+        <p>The Drop / Scroll to expand</p>
         <h2>Closet, in motion.</h2>
       </div>
       <section ref={sectionRef} className="scroll-grid">

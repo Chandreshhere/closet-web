@@ -1,12 +1,10 @@
 import { useState } from 'react'
-import ClothCanvas from './ClothCanvas'
 import './Hero.css'
 
 export default function Hero() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
     <section className="hero" id="hero">
-      {/* <ClothCanvas /> */}
       {/* ─── Top row: ASCII brand · nav · contact ─── */}
       <header className={`hero__top ${menuOpen ? 'is-open' : ''}`}>
         <button
@@ -58,20 +56,6 @@ export default function Hero() {
             Twenty-four premium brands, AR try-on, and 30-minute delivery.
             That’s how ClosetX rewires the way you dress.
           </p>
-          <ul className="hero__meta-stats">
-            <li>
-              <span className="hero__meta-stat-num">24+</span>
-              <span className="hero__meta-stat-cap">Brands</span>
-            </li>
-            <li>
-              <span className="hero__meta-stat-num">30 min</span>
-              <span className="hero__meta-stat-cap">Avg delivery</span>
-            </li>
-            <li>
-              <span className="hero__meta-stat-num">AR</span>
-              <span className="hero__meta-stat-cap">Try-on</span>
-            </li>
-          </ul>
         </div>
 
         {/* Location */}
@@ -112,7 +96,6 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="hero__rule" />
 
       {/* ─── Giant editorial headline ─── */}
       <div className="hero__headline">
